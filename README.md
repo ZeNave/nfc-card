@@ -26,7 +26,7 @@ template. The data travels inside the link, never to a server.
 - The part of a link after `#` (the *fragment*) is **never sent to the server**. Your website never sees any patient data.
 - Every tap loads the same template and fills it from that card's own data. Three cards from one family give three separate pages. Nothing is shared or cached between them.
 - The page uses no cookies, no localStorage, no analytics, no service worker. The data lives in a JavaScript variable until the tab closes.
-- Reloading the page shows "No readable data". That's intentional: the data was removed from the address bar, so the responder taps the card again.
+- Reloading the page shows "Sem dados legíveis". That's intentional: the data was removed from the address bar, so the responder taps the card again.
 
 ## Files
 
@@ -79,7 +79,7 @@ git push -u origin main
    **"Your site is live at `https://USERNAME.github.io/nfc-card/`"**
 6. Open that address. You will see the placeholder home page.
 7. Now open the card page: `https://USERNAME.github.io/nfc-card/r/`. You should see
-   *"No readable data in this link…"*. That's correct, because there is no data in the link yet.
+   *"Sem dados legíveis neste link…"*. That's correct, because there is no data in the link yet.
 
 Your two addresses are now:
 
@@ -119,8 +119,8 @@ Requires Python 3 (nothing to install). Run on your own computer, in the folder 
    https://USERNAME.github.io/nfc-card/r/#zJY9Bi8IwEIX_...
 
    TEXT TO WRITE (record type: Text, add it AFTER the URL record):
-   NAME: Maria Teste Silva
-   BLOOD: A+
+   NOME: Maria Teste Silva
+   SANGUE: A+
    ...
 
    Bytes used on chip: 584 of 888 (NTAG216), 304 left
@@ -145,16 +145,29 @@ python3 generate.py --decode "https://USERNAME.github.io/nfc-card/r/#zJY9..."
 
 ### Profile fields
 
-| Key | Meaning | | Key | Meaning |
-|---|---|---|---|---|
-| `n` | Name | | `ins` | Insurer |
-| `b` | Date of birth | | `pol` | Policy number |
-| `s` | Sex | | `pl` | Plate |
-| `bt` | Blood type | | `ice` | List of emergency contacts: `{"r": relation, "n": name, "p": phone}` |
-| `al` | Allergies | | | |
-| `md` | Medications | | | |
-| `cd` | Conditions | | | |
-| `nt` | Notes | | | |
+The card page and the plain-text fallback are in European Portuguese. Each field in the profile
+JSON has a short key (to save bytes) and shows up under a Portuguese label:
+
+| Key | Shown on the page as | Section |
+|---|---|---|
+| `n` | Nome | Pessoa |
+| `b` | Data de nascimento | Pessoa |
+| `s` | Sexo | Pessoa |
+| `bt` | Grupo sanguíneo | Dados médicos |
+| `al` | Alergias | Dados médicos |
+| `md` | Medicação | Dados médicos |
+| `cd` | Condições médicas | Dados médicos |
+| `nt` | Notas | Dados médicos |
+| `hi` | Seguradora | Seguro de saúde |
+| `hp` | N.º da apólice | Seguro de saúde |
+| `hn` | N.º de beneficiário | Seguro de saúde |
+| `ins` | Seguradora | Seguro automóvel |
+| `pol` | N.º da apólice | Seguro automóvel |
+| `pl` | Matrícula | Seguro automóvel |
+| `ice` | Contactos de emergência | list of `{"r": relação, "n": nome, "p": telefone}` |
+
+To change the wording or the language, edit `SECTIONS` in `r/index.html` and `LABELS` in
+`generate.py`. Accented letters take 2 bytes each on the card.
 
 Leave out any field you don't want shown. Every byte counts, so keep it to the essentials.
 The photo does **not** fit on the chip: print it on the card or holder.
@@ -293,7 +306,7 @@ Links:
   clears it. Describe it honestly: *"nothing is stored by our service and the page saves nothing
   on the phone"*, not *"nothing is stored anywhere"*.
 - **Browser support:** the page needs a recent browser (roughly Chrome 103, Safari 16.4,
-  Firefox 113 or newer) to decompress the data. Older phones show "No readable data", which is
+  Firefox 113 or newer) to decompress the data. Older phones show "Sem dados legíveis", which is
   why the plain-text record on the card matters.
 - **MIFARE Classic cards are not suitable.** If TagInfo shows MIFARE Classic rather than NTAG,
   keep it for experiments only. Buy NTAG216 for the product.
@@ -302,7 +315,7 @@ Links:
 
 | Problem | Likely cause and fix |
 |---|---|
-| Page shows "No readable data" after tapping | The link on the card is wrong or truncated. Read the card in NFC Tools and compare to the generator output. Also check you didn't reload the page. |
+| Page shows "Sem dados legíveis" after tapping | The link on the card is wrong or truncated. Read the card in NFC Tools and compare to the generator output. Also check you didn't reload the page. |
 | Page is blank or 404 | Pages isn't live yet (wait 2 minutes), or the link doesn't match your repo name or the `/r/` path. Open `…/nfc-card/r/` in a browser to check. |
 | Write fails with "not enough space" | Over 888 bytes. Run `generate.py` without `--text`, or shorten fields. |
 | Link has `https://https://` | You pasted a full link while the protocol drop-down was already on `https://`. Remove one. |

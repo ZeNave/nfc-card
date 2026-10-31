@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-PT">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex">
 <meta http-equiv="Content-Security-Policy"
       content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'">
-<title>Emergency Info</title>
+<title>Informação de emergência</title>
 <style>
   :root { color-scheme: light dark; }
   body { font-family: system-ui, sans-serif; margin: 0; padding: 16px; line-height: 1.4; }
@@ -24,7 +24,7 @@
 </style>
 </head>
 <body>
-<main id="app"><p>Loading…</p></main>
+<main id="app"><p>A carregar…</p></main>
 
 <script>
 (async () => {
@@ -32,10 +32,11 @@
 
   // Field keys on the card are short to save bytes.
   const SECTIONS = [
-    ['Person',        [['n','Name'], ['b','Date of birth'], ['s','Sex']]],
-    ['Medical',       [['bt','Blood type'], ['al','Allergies', true], ['md','Medications', true],
-                       ['cd','Conditions'], ['nt','Notes']]],
-    ['Car insurance', [['ins','Insurer'], ['pol','Policy no.'], ['pl','Plate']]],
+    ['Pessoa',           [['n','Nome'], ['b','Data de nascimento'], ['s','Sexo']]],
+    ['Dados médicos',    [['bt','Grupo sanguíneo'], ['al','Alergias', true], ['md','Medicação', true],
+                          ['cd','Condições médicas'], ['nt','Notas']]],
+    ['Seguro de saúde',  [['hi','Seguradora'], ['hp','N.º da apólice'], ['hn','N.º de beneficiário']]],
+    ['Seguro automóvel', [['ins','Seguradora'], ['pol','N.º da apólice'], ['pl','Matrícula']]],
   ];
 
   function b64urlToBytes(s) {
@@ -64,7 +65,7 @@
   }
 
   function render(data) {
-    app.replaceChildren(el('h1', null, 'EMERGENCY INFORMATION'));
+    app.replaceChildren(el('h1', null, 'INFORMAÇÃO DE EMERGÊNCIA'));
 
     for (const [title, fields] of SECTIONS) {
       const rows = fields
@@ -75,10 +76,10 @@
     }
 
     if (Array.isArray(data.ice) && data.ice.length) {
-      app.append(el('h2', null, 'Emergency contacts'));
+      app.append(el('h2', null, 'Contactos de emergência'));
       for (const c of data.ice) {
         const r = el('div', 'row');
-        r.append(el('span', 'label', c.r ? String(c.r) : 'Contact'));
+        r.append(el('span', 'label', c.r ? String(c.r) : 'Contacto'));
         const v = el('span', 'value', c.n ? String(c.n) : '');
         if (c.p) {
           v.append(document.createElement('br'));
@@ -92,7 +93,7 @@
     }
 
     app.append(el('p', 'foot',
-      'Read directly from the card. Nothing is sent to a server or saved on this phone.'));
+      'Lido diretamente do cartão. Nada é enviado para um servidor nem guardado neste telemóvel.'));
   }
 
   try {
@@ -112,8 +113,8 @@
     render(JSON.parse(new TextDecoder().decode(json)));
   } catch (e) {
     app.replaceChildren(
-      el('h1', null, 'EMERGENCY INFORMATION'),
-      el('p', null, 'No readable data in this link. If the card has a plain-text record, read that instead.'));
+      el('h1', null, 'INFORMAÇÃO DE EMERGÊNCIA'),
+      el('p', null, 'Sem dados legíveis neste link. Se o cartão tiver um registo de texto simples, leia esse.'));
   }
 })();
 </script>
